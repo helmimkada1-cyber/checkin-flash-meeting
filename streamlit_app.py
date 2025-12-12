@@ -31,6 +31,18 @@ HUMEUR_SCORES = {"😫": 1, "😟": 2, "😐": 3, "🙂": 4, "😄": 5}
 EMOJIS_HUMEUR = ["😫", "😟", "😐", "🙂", "😄"]
 
 # =============================================================================
+# INITIALISATION SESSION STATE
+# =============================================================================
+if "checkin_submitted" not in st.session_state:
+    st.session_state.checkin_submitted = False
+if "kudos_submitted" not in st.session_state:
+    st.session_state.kudos_submitted = False
+if "idea_submitted" not in st.session_state:
+    st.session_state.idea_submitted = False
+if "form_key" not in st.session_state:
+    st.session_state.form_key = 0
+
+# =============================================================================
 # STYLES CSS PERSONNALISÉS
 # =============================================================================
 st.markdown("""
@@ -231,14 +243,17 @@ with tab_checkin:
     else:
         st.subheader(f"Comment ça va aujourd'hui, {utilisateur_actuel} ?")
         
+        # Utiliser une clé unique basée sur form_key pour réinitialiser les widgets
+        fk = st.session_state.form_key
+        
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            site = st.selectbox("📍 Ton site", SITES, key="checkin_site")
+            site = st.selectbox("📍 Ton site", SITES, key=f"checkin_site_{fk}")
         with col2:
-            poste = st.selectbox("💼 Ton poste", POSTES, key="checkin_poste")
+            poste = st.selectbox("💼 Ton poste", POSTES, key=f"checkin_poste_{fk}")
         with col3:
-            date_checkin = st.date_input("📅 Date", value=datetime.now(), key="checkin_date")
+            date_checkin = st.date_input("📅 Date", value=datetime.now(), key=f"checkin_date_{fk}")
         
         st.markdown("---")
         
@@ -250,12 +265,12 @@ with tab_checkin:
                 "Comment te sens-tu ?",
                 options=EMOJIS_HUMEUR,
                 value="🙂",
-                key="checkin_humeur"
+                key=f"checkin_humeur_{fk}"
             )
         
         with col_energie:
             st.markdown("#### ⚡ Niveau d'énergie")
-            energie = st.slider("De 1 à 5", 1, 5, 3, key="checkin_energie")
+            energie = st.slider("De 1 à 5", 1, 5, 3, key=f"checkin_energie_{fk}")
         
         with col_charge:
             st.markdown("#### 📊 Charge de travail")
@@ -263,13 +278,13 @@ with tab_checkin:
                 "Ta charge",
                 options=["😌 Calme", "🙂 Normal", "😓 Chargé", "🔥 Débordé"],
                 value="🙂 Normal",
-                key="checkin_charge"
+                key=f"checkin_charge_{fk}"
             )
         
         st.markdown("---")
         
         st.markdown("#### ⚠️ Problèmes ou alertes")
-        a_probleme = st.checkbox("J'ai un problème à signaler", key="checkin_probleme")
+        a_probleme = st.checkbox("J'ai un problème à signaler", key=f"checkin_probleme_{fk}")
         
         type_probleme = None
         description_probleme = None
@@ -284,14 +299,14 @@ with tab_checkin:
                     "Type de problème",
                     ["🔧 Technique / Matériel", "📦 Stock / Réactifs", "💻 Informatique",
                      "📋 Organisation", "😤 Client mécontent", "👥 RH / Équipe", "❓ Autre"],
-                    key="type_pb"
+                    key=f"type_pb_{fk}"
                 )
             
             with col_p2:
-                urgence = st.radio("Urgence", ["🟢 Faible", "🟠 Moyen", "🔴 Urgent"], horizontal=True, key="urgence")
+                urgence = st.radio("Urgence", ["🟢 Faible", "🟠 Moyen", "🔴 Urgent"], horizontal=True, key=f"urgence_{fk}")
             
-            description_probleme = st.text_area("Décris le problème", key="desc_pb", height=100)
-            impact_patient = st.checkbox("⚠️ Impact patient potentiel", key="impact")
+            description_probleme = st.text_area("Décris le problème", key=f"desc_pb_{fk}", height=100)
+            impact_patient = st.checkbox("⚠️ Impact patient potentiel", key=f"impact_{fk}")
         
         st.markdown("---")
         
@@ -299,13 +314,13 @@ with tab_checkin:
         
         with col_v1:
             st.markdown("#### 🎉 Une victoire ?")
-            victoire = st.text_area("Partage une bonne nouvelle", key="victoire", height=80)
+            victoire = st.text_area("Partage une bonne nouvelle", key=f"victoire_{fk}", height=80)
         
         with col_v2:
             st.markdown("#### 🆘 Besoin d'aide ?")
-            besoin_aide = st.text_area("Décris ton besoin", key="aide", height=80)
+            besoin_aide = st.text_area("Décris ton besoin", key=f"aide_{fk}", height=80)
         
-        commentaire = st.text_area("💬 Autre chose ?", key="commentaire", height=60)
+        commentaire = st.text_area("💬 Autre chose ?", key=f"commentaire_{fk}", height=60)
         
         if st.button("✅ Envoyer mon check-in", type="primary", use_container_width=True):
             if a_probleme and not description_probleme:
@@ -335,6 +350,9 @@ with tab_checkin:
                     save_checkin(checkin)
                     st.success("✅ Check-in enregistré ! Merci 🙏")
                     st.balloons()
+                    # Incrémenter la clé pour réinitialiser le formulaire
+                    st.session_state.form_key += 1
+                    st.rerun()
                 except Exception as e:
                     st.error(f"Erreur : {e}")
 
@@ -350,23 +368,25 @@ with tab_kudos:
     with col_form:
         st.markdown("#### Envoyer un Kudos")
         
+        fk = st.session_state.form_key
+        
         if utilisateur_actuel != "-- Sélectionne ton nom --":
             destinataire = st.selectbox(
                 "👤 À qui ?",
                 [c for c in COLLABORATEURS if c != utilisateur_actuel],
-                key="kudos_dest"
+                key=f"kudos_dest_{fk}"
             )
         else:
-            destinataire = st.selectbox("👤 Destinataire", COLLABORATEURS, key="kudos_dest2")
+            destinataire = st.selectbox("👤 Destinataire", COLLABORATEURS, key=f"kudos_dest2_{fk}")
         
         categorie_kudos = st.selectbox(
             "🏷️ Catégorie",
             ["🤝 Entraide", "😊 Bonne humeur", "⭐ Travail remarquable", 
              "💪 Persévérance", "🎯 Efficacité", "💡 Bonne idée"],
-            key="kudos_cat"
+            key=f"kudos_cat_{fk}"
         )
         
-        message_kudos = st.text_area("💬 Ton message", key="kudos_msg", height=100)
+        message_kudos = st.text_area("💬 Ton message", key=f"kudos_msg_{fk}", height=100)
         
         if st.button("🌟 Envoyer le Kudos", use_container_width=True):
             if utilisateur_actuel == "-- Sélectionne ton nom --":
@@ -386,6 +406,8 @@ with tab_kudos:
                     save_kudos(kudo)
                     st.success(f"🌟 Kudos envoyé à {destinataire} !")
                     st.balloons()
+                    st.session_state.form_key += 1
+                    st.rerun()
                 except Exception as e:
                     st.error(f"Erreur : {e}")
     
@@ -418,14 +440,16 @@ with tab_ideas:
     with col_idea_form:
         st.markdown("#### Proposer une idée")
         
+        fk = st.session_state.form_key
+        
         categorie_idee = st.selectbox(
             "🏷️ Catégorie",
             ["🔧 Organisation", "💻 Outils", "📋 Process", "👥 Vie d'équipe", "🌱 Environnement"],
-            key="idea_cat"
+            key=f"idea_cat_{fk}"
         )
         
-        titre_idee = st.text_input("📌 Titre", key="idea_titre")
-        description_idee = st.text_area("📝 Description", key="idea_desc", height=150)
+        titre_idee = st.text_input("📌 Titre", key=f"idea_titre_{fk}")
+        description_idee = st.text_area("📝 Description", key=f"idea_desc_{fk}", height=150)
         
         if st.button("💡 Soumettre mon idée", use_container_width=True):
             if utilisateur_actuel == "-- Sélectionne ton nom --":
@@ -445,6 +469,8 @@ with tab_ideas:
                 try:
                     save_idea(idea)
                     st.success("💡 Idée soumise !")
+                    st.session_state.form_key += 1
+                    st.rerun()
                 except Exception as e:
                     st.error(f"Erreur : {e}")
     
