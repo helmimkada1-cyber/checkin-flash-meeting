@@ -23,7 +23,7 @@ PROBLEMS_STATUS_FILE = DATA_DIR / "problems_status.json"
 
 # Configuration équipe - À ADAPTER SELON TON ÉQUIPE
 COLLABORATEURS = ["Marie", "Thomas", "Sophie", "Lucas", "Emma", "Julie", "Pierre", "Camille"]
-SITES = ["BCP Lyon Centre", "BCP Part-Dieu", "BCP Villeurbanne"]
+SITES = ["Site A", "Site B", "Site C"]
 POSTES = ["Technicien", "Biologiste", "Secrétaire", "Coursier", "Responsable"]
 
 # Mapping humeur vers score numérique
@@ -225,7 +225,7 @@ with st.sidebar:
 st.markdown("""
 <div class="main-header">
     <h1 style="margin: 0;">🧬 Check-in Flash Meeting</h1>
-    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Plateau Technique de Biologie • Eurofins</p>
+    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Plateau Technique de Biologie</p>
 </div>
 """, unsafe_allow_html=True)
 
