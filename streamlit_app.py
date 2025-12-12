@@ -41,6 +41,14 @@ if "idea_submitted" not in st.session_state:
     st.session_state.idea_submitted = False
 if "form_key" not in st.session_state:
     st.session_state.form_key = 0
+if "show_success_checkin" not in st.session_state:
+    st.session_state.show_success_checkin = False
+if "show_success_kudos" not in st.session_state:
+    st.session_state.show_success_kudos = False
+if "show_success_idea" not in st.session_state:
+    st.session_state.show_success_idea = False
+if "kudos_destinataire" not in st.session_state:
+    st.session_state.kudos_destinataire = ""
 
 # =============================================================================
 # STYLES CSS PERSONNALISÉS
@@ -238,6 +246,12 @@ tab_checkin, tab_kudos, tab_ideas, tab_historique, tab_stats, tab_suivi = st.tab
 # =============================================================================
 with tab_checkin:
     
+    # Afficher le message de succès si nécessaire
+    if st.session_state.show_success_checkin:
+        st.success("✅ Check-in enregistré ! Merci 🙏")
+        st.balloons()
+        st.session_state.show_success_checkin = False
+    
     if utilisateur_actuel == "-- Sélectionne ton nom --":
         st.warning("👈 Sélectionne ton nom dans la barre latérale pour commencer")
     else:
@@ -348,10 +362,9 @@ with tab_checkin:
                 
                 try:
                     save_checkin(checkin)
-                    st.success("✅ Check-in enregistré ! Merci 🙏")
-                    st.balloons()
                     # Incrémenter la clé pour réinitialiser le formulaire
                     st.session_state.form_key += 1
+                    st.session_state.show_success_checkin = True
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erreur : {e}")
@@ -360,6 +373,12 @@ with tab_checkin:
 # TAB 2 : KUDOS
 # =============================================================================
 with tab_kudos:
+    
+    # Afficher le message de succès si nécessaire
+    if st.session_state.show_success_kudos:
+        st.success(f"🌟 Kudos envoyé à {st.session_state.kudos_destinataire} !")
+        st.balloons()
+        st.session_state.show_success_kudos = False
     
     st.subheader("🌟 Kudos - Reconnaissance entre collègues")
     
@@ -404,9 +423,9 @@ with tab_kudos:
                 }
                 try:
                     save_kudos(kudo)
-                    st.success(f"🌟 Kudos envoyé à {destinataire} !")
-                    st.balloons()
                     st.session_state.form_key += 1
+                    st.session_state.show_success_kudos = True
+                    st.session_state.kudos_destinataire = destinataire
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erreur : {e}")
@@ -432,6 +451,12 @@ with tab_kudos:
 # TAB 3 : IDÉES
 # =============================================================================
 with tab_ideas:
+    
+    # Afficher le message de succès si nécessaire
+    if st.session_state.show_success_idea:
+        st.success("💡 Idée soumise !")
+        st.balloons()
+        st.session_state.show_success_idea = False
     
     st.subheader("💡 Boîte à idées")
     
@@ -468,8 +493,8 @@ with tab_ideas:
                 }
                 try:
                     save_idea(idea)
-                    st.success("💡 Idée soumise !")
                     st.session_state.form_key += 1
+                    st.session_state.show_success_idea = True
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erreur : {e}")
