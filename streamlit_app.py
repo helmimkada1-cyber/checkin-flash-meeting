@@ -741,6 +741,6 @@ with tab_suivi:
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #666; padding: 1rem;">
-    <small>🧬 Check-in Flash Meeting • Plateau Technique Eurofins</small>
+    <small>🧬 Check-in Flash Meeting • Plateau Technique</small>
 </div>
 """, unsafe_allow_html=True)
